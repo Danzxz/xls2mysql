@@ -13,7 +13,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Копируем файлы приложения
-COPY .src .
+COPY ./src .
 
 # Указываем порт
 EXPOSE 80

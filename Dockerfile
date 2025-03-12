@@ -13,10 +13,10 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Копируем файлы приложения
-COPY . .
+COPY .src .
 
 # Указываем порт
 EXPOSE 80
 
 # Запускаем приложение с увеличенным timeout
-CMD ["gunicorn", "--bind", "0.0.0.0:80", "--reuse-port", "--reload", "--timeout", "6000", "main:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:80", "--timeout", "6000", "main:app"]

@@ -1,0 +1,64 @@
+uploads/
+# Platform and IDE-generated files
+.DS_Store
+.idea
+.project
+.pydevproject
+.vscode
+.devcontainer
+
+# Python-related ignores
+*.pyc
+*.pyo
+
+
+# Virtual environment folders
+.Python
+bin/
+/include/
+lib/
+local/
+share/
+node_modules/
+
+# Obsolete ignores
+/*.xml
+*.log
+*.ipynb
+*.*~
+/static/
+static/thumb/*
+/static/thumb/*
+/nbproject/
+exchange/
+/static/img/logos/
+static/img/logos/*
+*.db
+application/__init__.py
+/media
+settings.json
+mail_example.html
+
+
+# PIP
+pip-selfcheck.json
+
+# Wiper
+wiper.yaml
+
+dump.rdb
+
+!**/assets/**/src
+*.mo
+
+/postgres/**/*.sql
+.env
+/htmlcov/
+.coverage
+test_image.png
+
+entrypoint-local.sh
+
+.keys
+.config-*.yaml
+.aider*

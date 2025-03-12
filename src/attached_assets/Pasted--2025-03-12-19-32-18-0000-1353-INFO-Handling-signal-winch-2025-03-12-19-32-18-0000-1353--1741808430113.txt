@@ -1,0 +1,41 @@
+[2025-03-12 19:32:18 +0000] [1353] [INFO] Handling signal: winch
+[2025-03-12 19:32:18 +0000] [1353] [INFO] Handling signal: winch
+[2025-03-12 19:32:23 +0000] [1353] [INFO] Handling signal: winch
+DEBUG:db_operations:Creating table with SQL: CREATE TABLE `test_from_xls` (`выручка` VARCHAR(255), `заказ_клиента_/_реализация.insails_тип_оплаты` VARCHAR(255), `address` VARCHAR(255), `order_date` VARCHAR(255), `manager` VARCHAR(255), `number` VARCHAR(255), `client` VARCHAR(255), `jur_region` VARCHAR(255), `region` VARCHAR(255), `клиент.головное_предприятие` VARCHAR(255), `клиент.заказывает_напрямую_(клиенты)` VARCHAR(255), `code` VARCHAR(255), `main_manager` VARCHAR(255), `клиент.пометка_удаления` VARCHAR(255), `status` VARCHAR(255), `type_of_point` VARCHAR(255), `количество` VARCHAR(255), `контрагент` VARCHAR(255), `brand` VARCHAR(255), `weight` VARCHAR(255), `product_type` VARCHAR(255), `номенклатура.вкус_(общие)` VARCHAR(255), `group` VARCHAR(255), `name_for_print` VARCHAR(255), `seller` VARCHAR(255), `организации` VARCHAR(255), `year` VARCHAR(255), `day` VARCHAR(255), `month` VARCHAR(255), `week_of_year` VARCHAR(255), `поставщик` VARCHAR(255), `warehouse` VARCHAR(255))
+[2025-03-12 19:38:39 +0000] [1353] [CRITICAL] WORKER TIMEOUT (pid:1364)
+[2025-03-12 19:38:40 +0000] [1364] [ERROR] Error handling request /sync_data
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/app.py", line 251, in sync_data
+    result = perform_sync(
+             ^^^^^^^^^^^^^
+  File "/home/runner/workspace/db_operations.py", line 225, in perform_sync
+    cursor.execute(insert_sql, list(row_dict.values()))
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/mysql/connector/cursor_cext.py", line 351, in execute
+    self._connection.cmd_query(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/mysql/connector/opentelemetry/context_propagation.py", line 97, in wrapper
+    return method(cnx, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 755, in cmd_query
+    self._cmysql.query(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-03-12 19:38:40 +0000] [1364] [INFO] Worker exiting (pid: 1364)
+[2025-03-12 19:38:40 +0000] [1430] [INFO] Booting worker with pid: 1430

@@ -7,14 +7,8 @@ services:
       - "80:80"
     environment:
       - PYTHONUNBUFFERED=1
-      - DB_HOST=mysql
-      - DB_USER=${MYSQL_USER:-excel_user}
-      - DB_PASSWORD=${MYSQL_PASSWORD:-excel_password}
-      - DB_NAME=${MYSQL_DATABASE:-excel_sync_db}
       - SESSION_SECRET=${SESSION_SECRET:-default_secret_key}
     restart: unless-stopped
-    depends_on:
-      - mysql
     volumes:
       - ./uploads:/app/uploads
     networks:

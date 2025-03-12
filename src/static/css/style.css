@@ -101,3 +101,14 @@
 .btn:focus {
     box-shadow: 0 0 0 0.25rem rgba(var(--bs-info-rgb), 0.25);
 }
+
+#loadingAlert {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1050; /* Чтобы оно было поверх других элементов */
+    width: 80%;
+    max-width: 500px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}

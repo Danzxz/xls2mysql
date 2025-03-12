@@ -190,6 +190,23 @@ def column_mapping():
         session['column_mapping'] = column_mapping
         session['primary_key'] = primary_key
         
+        # Get row limit settings
+        limit_enabled = 'limit_enabled' in request.form
+        row_limit = None
+        
+        if limit_enabled:
+            try:
+                row_limit_str = request.form.get('row_limit', '')
+                if row_limit_str.strip():
+                    row_limit = int(row_limit_str)
+                    if row_limit <= 0:
+                        row_limit = None
+            except ValueError:
+                row_limit = None
+        
+        logger.info(f"Row limit settings: enabled={limit_enabled}, limit={row_limit}")
+        session['row_limit'] = row_limit
+        
         if create_new:
             # Define column types for new table
             column_types = {}
@@ -248,12 +265,16 @@ def sync_data():
             flash(f'Table {table_name} created successfully', 'success')
         
         # Perform sync operation
+        row_limit = session.get('row_limit')
+        logger.info(f"Starting data sync for table '{table_name}' with row limit: {row_limit}")
+        
         result = perform_sync(
             session['db_config'],
             session['excel_file'],
             session['table_name'],
             session['column_mapping'],
-            session.get('primary_key')
+            session.get('primary_key'),
+            row_limit
         )
         
         return render_template('sync_results.html', result=result)

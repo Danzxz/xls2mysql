@@ -129,11 +129,20 @@ def create_table(db_config, table_name, column_defs, primary_key=None):
         cursor.close()
         conn.close()
 
-def perform_sync(db_config, excel_file, table_name, column_mapping, primary_key=None):
+def perform_sync(db_config, excel_file, table_name, column_mapping, primary_key=None, row_limit=None):
     """
     Synchronize data from Excel file to MySQL table using UPSERT logic.
     Returns statistics about the operation.
+    
+    Parameters:
+        db_config: Database connection parameters
+        excel_file: Path to Excel file
+        table_name: MySQL table name
+        column_mapping: Dictionary mapping Excel columns to DB columns
+        primary_key: Primary key column for UPSERT logic (optional)
+        row_limit: Optional limit on number of rows to process
     """
+    logger.info(f"perform_sync started for table: {table_name}, primary_key: {primary_key}, row_limit: {row_limit}")
     conn = get_connection(db_config)
     cursor = conn.cursor(dictionary=True)
     
@@ -146,14 +155,21 @@ def perform_sync(db_config, excel_file, table_name, column_mapping, primary_key=
     }
     
     try:
-        # Read Excel data - with reduced rows for Replit environment
+        # Read Excel data
+        logger.info(f"Reading Excel file: {excel_file}")
         df = pd.read_excel(excel_file)
         orig_row_count = len(df)
         result['total_rows'] = orig_row_count
+        logger.info(f"Excel file contains {orig_row_count} rows")
         
-        # Limit to first 20 rows for Replit environment to avoid timeouts
-        if len(df) > 20:
-            logger.info(f"NOTE: Processing only first 20 rows out of {len(df)} for Replit environment performance")
+        # Apply row limit if specified
+        if row_limit and row_limit > 0 and len(df) > row_limit:
+            logger.info(f"Limiting process to first {row_limit} rows out of {len(df)} based on user settings")
+            df = df.head(row_limit)
+            result['total_rows'] = len(df)
+        # If no explicit limit, but we're in Replit with a large file, apply a safe limit
+        elif row_limit is None and len(df) > 20:
+            logger.info(f"No row limit specified but file is large. Applying default limit of 20 rows for Replit environment")
             df = df.head(20)
             result['total_rows'] = len(df)
         

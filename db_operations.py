@@ -143,6 +143,12 @@ def perform_sync(db_config, excel_file, table_name, column_mapping, primary_key=
         row_limit: Optional limit on number of rows to process
     """
     logger.info(f"perform_sync started for table: {table_name}, primary_key: {primary_key}, row_limit: {row_limit}")
+    
+    # Verify database connection before starting
+    logger.info("Testing database connection before starting sync...")
+    test_connection(db_config)
+    logger.info("Database connection successful, proceeding with sync")
+    
     conn = get_connection(db_config)
     cursor = conn.cursor(dictionary=True)
     
@@ -201,17 +207,23 @@ def perform_sync(db_config, excel_file, table_name, column_mapping, primary_key=
                 try:
                     # Convert NaN values to None and convert data types safely
                     row_dict = {}
+                    row_values_debug = []
                     for k, v in row.items():
                         if pd.isna(v):
                             row_dict[k] = None
+                            row_values_debug.append(f"{k}=NULL")
                         elif isinstance(v, (int, float)):
                             row_dict[k] = v
+                            row_values_debug.append(f"{k}={v}")
                         else:
                             # Convert to string and truncate if needed (prevent oversized data)
                             val_str = str(v)
                             if len(val_str) > 250:  # Keep under VARCHAR(255) limit
                                 val_str = val_str[:250]
                             row_dict[k] = val_str
+                            row_values_debug.append(f"{k}={val_str[:20]}...")
+                    
+                    logger.info(f"Processing row {rows_processed + 1}: {', '.join(row_values_debug[:3])}...")
                     
                     # If we have a primary key, check if record exists
                     if primary_key and primary_key in row_dict and row_dict[primary_key] is not None:
@@ -235,8 +247,10 @@ def perform_sync(db_config, excel_file, table_name, column_mapping, primary_key=
                             # Simplified UPDATE
                             update_sql = f"UPDATE `{table_name}` SET {', '.join(set_parts)} WHERE `{primary_key}` = %s"
                             
+                            logger.info(f"Executing UPDATE query: {update_sql} with primary key: {row_dict[primary_key]}")
                             cursor.execute(update_sql, values)
                             result['updated'] += 1
+                            logger.info(f"UPDATE successful for record with primary key: {row_dict[primary_key]}")
                         else:
                             # Perform INSERT
                             columns = list(row_dict.keys())
@@ -245,8 +259,11 @@ def perform_sync(db_config, excel_file, table_name, column_mapping, primary_key=
                             # Simplified INSERT
                             insert_sql = f"INSERT INTO `{table_name}` (`{'`, `'.join(columns)}`) VALUES ({', '.join(placeholders)})"
                             
-                            cursor.execute(insert_sql, list(row_dict.values()))
+                            logger.info(f"Executing INSERT query: {insert_sql} with {len(columns)} columns")
+                            values_list = list(row_dict.values())
+                            cursor.execute(insert_sql, values_list)
                             result['inserted'] += 1
+                            logger.info(f"INSERT successful, new record added")
                     else:
                         # No primary key, just INSERT
                         columns = list(row_dict.keys())
@@ -255,23 +272,38 @@ def perform_sync(db_config, excel_file, table_name, column_mapping, primary_key=
                         # Simplified INSERT
                         insert_sql = f"INSERT INTO `{table_name}` (`{'`, `'.join(columns)}`) VALUES ({', '.join(placeholders)})"
                         
-                        cursor.execute(insert_sql, list(row_dict.values()))
+                        logger.info(f"Executing INSERT query (no PK): {insert_sql} with {len(columns)} columns")
+                        values_list = list(row_dict.values())
+                        cursor.execute(insert_sql, values_list)
                         result['inserted'] += 1
+                        logger.info(f"INSERT successful, new record added (no PK match)")
                         
                     rows_processed += 1
                     
                     # Commit after EVERY row in Replit environment
                     conn.commit()
                     
+                    # Более безопасный вывод сообщения о результате
+                    operation_type = "Inserted"
+                    if 'record_exists' in locals() and record_exists:
+                        operation_type = "Updated"
+                    logger.info(f"Row {rows_processed} processed successfully: {operation_type}")
+                    
                 except Exception as e:
                     conn.rollback()  # Rollback on error
-                    logger.error(f"Error processing row: {str(e)}")
+                    logger.error(f"Error processing row {rows_processed}: {str(e)}")
                     result['errors'] += 1
                     result['error_messages'].append(str(e))
         
+        # Log completion statistics
+        logger.info(f"Sync completed. Processed {rows_processed} rows out of {orig_row_count}. Inserted: {result['inserted']}, Updated: {result['updated']}, Errors: {result['errors']}")
+        
         # Add note about partial processing
-        if orig_row_count > 20:
-            result['note'] = f"NOTE: Only processed 20 rows out of {orig_row_count} for performance. In production, all rows would be processed."
+        if orig_row_count > result['total_rows']:
+            if row_limit:
+                result['note'] = f"Ограничение: Обработано {result['total_rows']} строк из {orig_row_count} согласно заданному лимиту ({row_limit})"
+            else:
+                result['note'] = f"Внимание: Обработано только {result['total_rows']} строк из {orig_row_count} для предотвращения тайм-аутов в Replit"
         
         return result
         

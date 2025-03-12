@@ -1,0 +1,55 @@
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+docker-start.sh
+docker-stop.sh
+
+# ENV файлы
+.env
+*.env
+
+# Виртуальное окружение
+venv/
+env/
+.venv/
+.env/
+
+# Python кэш
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Логи
+logs/
+*.log
+
+# Временные загрузки в Replit
+.replit
+replit.nix
+
+# Локальные папки для данных
+uploads/*
+!uploads/.gitkeep
+mysql-data/
+
+# IDE файлы
+.idea/
+.vscode/
+*.swp
+*.swo

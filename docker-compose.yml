@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "80:80"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DB_HOST=mysql
+      - DB_USER=${MYSQL_USER:-excel_user}
+      - DB_PASSWORD=${MYSQL_PASSWORD:-excel_password}
+      - DB_NAME=${MYSQL_DATABASE:-excel_sync_db}
+      - SESSION_SECRET=${SESSION_SECRET:-default_secret_key}
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    volumes:
+      - ./uploads:/app/uploads
+    networks:
+      - app-network
+
+  mysql:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-secret}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-excel_sync_db}
+      MYSQL_USER: ${MYSQL_USER:-excel_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-excel_password}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql-data:

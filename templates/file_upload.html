@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Excel File - Excel to MySQL Sync Tool</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header">
+                        <h2 class="mb-0">
+                            <i class="bi bi-file-earmark-excel me-2"></i>Upload Excel File
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text mb-4">
+                            Upload your Excel file (.xls or .xlsx) to begin the synchronization process.
+                            The file should contain data you want to import into your MySQL database.
+                        </p>
+
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        <form method="post" action="{{ url_for('file_upload') }}" enctype="multipart/form-data">
+                            <div class="mb-4">
+                                <label for="file" class="form-label">Excel File</label>
+                                <div class="file-upload-container">
+                                    <input type="file" class="form-control" id="file" name="file" accept=".xls,.xlsx" required>
+                                </div>
+                                <div class="form-text mt-2">
+                                    Maximum file size: 16MB. Supported formats: .xls, .xlsx
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-info mb-4">
+                                <h5 class="alert-heading">
+                                    <i class="bi bi-info-circle me-2"></i>Tips for preparing your Excel file:
+                                </h5>
+                                <ul class="mb-0">
+                                    <li>Ensure your data has column headers in the first row</li>
+                                    <li>Clear any empty rows or columns from your file</li>
+                                    <li>For optimal performance, keep file size under 10MB</li>
+                                    <li>For updating existing records, include a unique identifier column</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between mt-4">
+                                <a href="{{ url_for('connection') }}" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left me-2"></i>Back
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-upload me-2"></i>Upload
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

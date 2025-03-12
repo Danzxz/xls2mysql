@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sync Results - Excel to MySQL Sync Tool</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header">
+                        <h2 class="mb-0">
+                            <i class="bi bi-check2-circle me-2"></i>Sync Results
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <div class="display-1 text-success mb-3">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </div>
+                            <h3 class="mb-3">Synchronization Complete!</h3>
+                            <p class="lead">Your Excel data has been synchronized with the MySQL database.</p>
+                        </div>
+
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        <div class="card mb-4">
+                            <div class="card-header bg-info bg-opacity-25">
+                                <h5 class="mb-0">Summary</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3 mb-md-0">
+                                        <div class="card h-100 text-center">
+                                            <div class="card-body">
+                                                <h2 class="text-primary">{{ result.total_rows }}</h2>
+                                                <p class="card-text">Total Rows Processed</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3 mb-md-0">
+                                        <div class="card h-100 text-center">
+                                            <div class="card-body">
+                                                <h2 class="text-success">{{ result.inserted }}</h2>
+                                                <p class="card-text">Rows Inserted</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card h-100 text-center">
+                                            <div class="card-body">
+                                                <h2 class="text-info">{{ result.updated }}</h2>
+                                                <p class="card-text">Rows Updated</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% if result.errors > 0 %}
+                        <div class="card mb-4">
+                            <div class="card-header bg-danger bg-opacity-25">
+                                <h5 class="mb-0">Errors</h5>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>{{ result.errors }} error(s) occurred during synchronization:</strong></p>
+                                <ul class="mb-0">
+                                    {% for error in result.error_messages %}
+                                    <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                                <i class="bi bi-house me-2"></i>Home
+                            </a>
+                            <a href="{{ url_for('file_upload') }}" class="btn btn-primary">
+                                <i class="bi bi-arrow-repeat me-2"></i>Sync Another File
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
